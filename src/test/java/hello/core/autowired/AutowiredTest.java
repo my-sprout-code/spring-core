@@ -25,12 +25,12 @@ public class AutowiredTest {
         }
 
         @Autowired
-        public void setNoBean2(@Nullable Member noBean2) {
+        public void setNoBean2(@Nullable Member noBean2) { // 호출은 되지만 null
             System.out.println("noBean2 = " + noBean2);
         }
 
         @Autowired
-        public void setNoBean2(Optional<Member> noBean3) {
+        public void setNoBean2(Optional<Member> noBean3) { // Optional.empty
             System.out.println("noBean3 = " + noBean3);
         }
 
