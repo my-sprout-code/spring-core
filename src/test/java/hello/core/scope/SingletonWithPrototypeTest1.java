@@ -1,6 +1,7 @@
 package hello.core.scope;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -27,12 +28,12 @@ public class SingletonWithPrototypeTest1 {
 
     @Test
     void singletonClientUsePrototype() {
-        AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(ClientBean.class, ClientBean2.class, PrototypeBean.class);
+        AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(ClientBean.class, PrototypeBean.class);
 
-        ClientBean clientBean1 = ac.getBean(ClientBean.class);
-        ClientBean2 clientBean2 = ac.getBean(ClientBean2.class);
+        ClientBean clientBean = ac.getBean(ClientBean.class);
+        ClientBean clientBean2 = ac.getBean(ClientBean.class);
 
-        assertThat(clientBean1.logic()).isEqualTo(1);
+        assertThat(clientBean.logic()).isEqualTo(1);
         assertThat(clientBean2.logic()).isEqualTo(1);
 
     }
@@ -40,37 +41,21 @@ public class SingletonWithPrototypeTest1 {
 
     @Scope("singleton")
     static class ClientBean {
-        private PrototypeBean prototypeBean;
-
+        private final ObjectProvider<PrototypeBean> objectProvider;
 
         @Autowired
-        public void setPrototypeBean(PrototypeBean prototypeBean) {
-            this.prototypeBean = prototypeBean;
+        public ClientBean(ObjectProvider<PrototypeBean> objectProvider) {
+            this.objectProvider = objectProvider;
         }
 
         public int logic() {
+            PrototypeBean prototypeBean = objectProvider.getObject();
             prototypeBean.addCount();
             return prototypeBean.getCount();
         }
 
     }
 
-    @Scope("singleton")
-    static class ClientBean2 {
-        private PrototypeBean prototypeBean;
-
-
-        @Autowired
-        public void setPrototypeBean(PrototypeBean prototypeBean) {
-            this.prototypeBean = prototypeBean;
-        }
-
-        public int logic() {
-            prototypeBean.addCount();
-            return prototypeBean.getCount();
-        }
-
-    }
 
     @Scope("prototype")
     static class PrototypeBean {
